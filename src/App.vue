@@ -6,6 +6,7 @@ export default {
   setup() {
     const toggleDarkMode = inject('$toggleDarkMode')
     onMounted(() => {
+      localStorage.setItem('darkMode', true)
       const savedDarkMode = localStorage.getItem('darkMode')
         toggleDarkMode(savedDarkMode)
     })

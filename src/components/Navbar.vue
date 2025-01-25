@@ -5,6 +5,7 @@ export default {
   components: {Burger},
   data() {
       return {
+        username: '',
         is: {
           pallete: false,
           phone: false,
@@ -20,6 +21,7 @@ export default {
       }
     },
     mounted() {
+    this.username = JSON.parse(localStorage.getItem('user_info')).name
       this.getUserPhoto();
       this.isAdmin = true
       // if(this.isAdmin && (this.$user.bankGroupId !== null && this.$user.level == 1)){
@@ -70,7 +72,11 @@ export default {
       },
       getUserPhoto() {
         this.user.photo = null
-      }
+      },
+      logOut(){
+        localStorage.clear();
+         this.$router.push('/auth/login'); // Navigate to login page
+      },
     }
 }
 </script>
@@ -117,16 +123,13 @@ export default {
          alt="user"/>
     <!---------- OPTIONS ---------->
     <div class="topbarRight__select">
-      <a class="topbarRight__select-option"
-         href="/system/profile">
-        <i class="pltpblink__icon mdi mdi-cog"></i>
-        <span class="topbarRight__select-text">Sozlamalar</span>
-      </a>
-      <platon-link class="topbarRight__select-option"
-                 link="/system/logout">
-      <i class="pltpblink__icon fa fa-sign-out-alt"></i>
+      <div class="user_name text-center">
+        {{username}}
+      </div>
+      <button class="topbarRight__select-option" @click="logOut">
+
       <span class="topbarRight__select-text">Chiqish</span>
-			</platon-link>
+			</button>
     </div>
   </div>
 </div>

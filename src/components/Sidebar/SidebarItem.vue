@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div >
     <template
       v-if="hasOneShowingChild(item.children, item) &&
             (!onlyOneChild.children || onlyOneChild.noShowingChildren) &&
@@ -42,10 +42,12 @@ export default {
   },
   data() {
     this.onlyOneChild = null;
-    return {};
+    return {
+      userData: JSON.parse(localStorage.getItem('user_data'))
+    };
   },
   mounted() {
-    console.log('this.item', this.item);
+    console.log("item", this.item, this.userData)
   },
   methods: {
     hasOneShowingChild(children = [], parent) {

@@ -1,8 +1,7 @@
 <template>
   <div :class="{'has-logo': showLogo}">
     <div class="flex flex-row">
-       <Edit style="width: 24px"/>
-      <p style="width: 50px;">Mars</p>
+<img src="https://www.fido-biznes.uz/wp-content/uploads/2023/09/footerlogo.svg" alt="Fido-Biznes" style="max-width: 200px;">
     </div>
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <el-menu
@@ -15,7 +14,13 @@
         :collapse-transition="false"
         mode="vertical"
       >
-        <sidebar-item v-for="route in routes" :key="route.path" :item="route" :base-path="route.path" />
+<sidebar-item
+  v-for="route in routes"
+  :key="route.path"
+  :item="route"
+  :base-path="route.path"
+
+/>
       </el-menu>
     </el-scrollbar>
   </div>
@@ -45,24 +50,39 @@ export default {
         menuActiveText: '#409EFF' // Default active text color
       })
     },
-    routes: {
-      type: Array,
-      default: () => [
-    { path: '/cabinet/dashboard', name: 'Dashboard', meta: { title: 'Dashboard', icon: 'Document' } },
-    { path: '/cabinet/projects', name: 'Projects', meta: { title: 'Projects', icon: 'Briefcase' } },
-    { path: '/cabinet/workers', name: 'Employees', meta: { title: 'Employees', icon: 'User' } },
-    { path: '/cabinet/tasks', name: 'Tasks', meta: { title: 'Tasks', icon: 'List' } },
-    { path: '/cabinet/tickets', name: 'Tickets', meta: { title: 'Tickets', icon: 'Tickets' } },
-    { path: '/cabinet/profile', name: 'Profile', meta: { title: 'Profile', icon: 'UserFilled' } },
-        // Add other static routes as needed
-      ]
+ routes: {
+    type: Array,
+    default: () => {
+      const userRole = JSON.parse(localStorage.getItem('user_info')).role;
+      const routes = [
+        { path: '/cabinet/dashboard', name: 'Dashboard', meta: { title: 'Dashboard', icon: 'Document' }, perm: false },
+        { path: '/cabinet/projects', name: 'Projects', meta: { title: 'Projects', icon: 'Briefcase' }, perm: false },
+        { path: '/cabinet/workers', name: 'Employees', meta: { title: 'Employees', icon: 'User' }, perm: 'CO' },
+        { path: '/cabinet/tasks', name: 'Tasks', meta: { title: 'Tasks', icon: 'List' }, perm: false },
+        { path: '/cabinet/tickets', name: 'Tickets', meta: { title: 'Tickets', icon: 'Tickets' }, perm: false },
+        { path: '/cabinet/profile', name: 'Profile', meta: { title: 'Profile', icon: 'UserFilled' }, perm: false }
+      ];
+
+      // Remove the 'Workers' menu item if the user doesn't have 'CO' role
+      if (userRole !== 'CO') {
+        return routes.filter(route => route.name !== 'Employees');
+      }
+
+      return routes;
     }
+    }
+
   },
   computed: {
     activeMenu() {
       const { meta, path } = this.$route
       return meta.activeMenu || path
     }
+  },
+  data() {
+    return {
+      userData: JSON.parse(localStorage.getItem('user_info')) || { role: '' },
+    };
   }
 }
 </script>

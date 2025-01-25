@@ -5,21 +5,21 @@
       <div class="dropdown" ref="dropdown">
         <button class="options-btn" @click="toggleDropdown">⋮</button>
         <ul v-if="dropdownVisible" class="dropdown-menu">
-          <li @click="viewProject">View Project</li>
-          <li @click="editProject">Edit Project</li>
-          <li @click="deleteProject">Delete Project</li>
-          <li @click="enterChat">Enter  chat</li>
+          <li v-if="!is_public" @click="viewProject">View Project</li>
+          <li v-if="!is_public" @click="editProject">Edit Project</li>
+          <li v-if="!is_public" @click="deleteProject">Delete Project</li>
+          <li v-if="!is_public" @click="enterChat">Enter  chat</li>
+          <li class="dropdown-menu-item" v-if="is_public" @click="sendFeedback">Send feedback</li>
         </ul>
       </div>
     </div>
-    <div class="task-info">
-      <p>Умумий топшириқлар сони: <span>{{ project.total_tasks }}</span></p>
-      <p>Актив топшириқлар сони: <span>{{ project.active_tasks }}</span></p>
+    <div class="task-info" v-if="project.tasks_count && project.tasks_count>0">
+      <p>All tasks count: <span>{{ project.tasks_count }}</span></p>
     </div>
     <div class="manager-info">
-      <img :src="`https://smart-office.uz/uploads/images/${project.img}`" alt="Manager's Avatar" class="manager-avatar" />
-      <span>Лойиҳа раҳбари:</span>
-      <span class="manager-name">{{ project.owner_name }}</span>
+      <img :src="`https://www.bank-kredit.uz/media/store/images/png/platon_user.png`" alt="Manager's Avatar" class="manager-avatar" />
+      <span>Project Manager:</span>
+      <span class="manager-name">{{ project.pmId.firstName + ' '+  project.pmId.lastName}}</span>
     </div>
   </div>
 </template>
@@ -34,6 +34,10 @@ export default {
       type: Object,
       required: true,
     },
+    is_public: {
+      type: Boolean,
+      default: false,
+    }
   },
   data() {
     return {
@@ -48,6 +52,9 @@ export default {
       if (!this.$refs.dropdown.contains(event.target)) {
         this.dropdownVisible = false;
       }
+    },
+    sendFeedback(){
+      this.$emit('sendFeedback', this.project);
     },
     viewProject() {
       console.log('Viewing project:', this.project.name);

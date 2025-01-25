@@ -4,8 +4,8 @@ import axios from 'axios';
 
 // Create an Axios instance
 const axiosInstance = axios.create({
-  // baseURL: 'https://prime-core.uz/api',
-    baseURL: 'http://helped-lucky-prawn.ngrok-free.app/api',
+  baseURL: 'https://prime-core.uz/api',
+    // baseURL: 'https://helped-lucky-prawn.ngrok-free.app/api',
   timeout: 10000,
   headers:{
     'Content-Type': 'application/json'
@@ -14,7 +14,7 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   config => {
-    const token = localStorage.getItem('access_token');
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYiLCJ1c2VybmFtZSI6ImZhemxpZGRpbiIsImVtYWlsIjoiZmF6bGlkZGluQGdtYWlsLmNvbSIsImZpcnN0X25hbWUiOiJGYXpsaWRkaW4iLCJsYXN0X25hbWUiOiJHYWRveWV2IiwiaWF0IjoxNzMxNzE1ODk3LCJleHAiOjE3MzE5NzUwOTd9.t9w1CZdLu9xzlzs3a6bgn2uUs775qgBdeNb7jG64B78'
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }

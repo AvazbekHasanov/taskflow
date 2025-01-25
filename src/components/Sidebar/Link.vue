@@ -23,7 +23,6 @@ export default {
     }
   },
   mounted() {
-    console.log("this.to",this.to)
     },
   methods: {
     linkProps(to) {

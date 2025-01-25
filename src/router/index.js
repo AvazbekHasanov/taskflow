@@ -89,8 +89,8 @@ const router = createRouter({
 const publicRoutes = ['login', 'registration']
 
 router.beforeEach((to, from, next) => {
-    // publicRoutes.includes(to.name)
-  if ( true) {
+
+  if ( publicRoutes.includes(to.name)) {
     next();
   } else {
       let jwt = localStorage.getItem('access_token');

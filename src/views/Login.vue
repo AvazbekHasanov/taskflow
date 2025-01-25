@@ -21,14 +21,37 @@ const password = reactive({
 const isSaveUsername = ref(false)
 const login = (e)=>{
   e.preventDefault();
-  proxy.$axios.post('/v1/auth/', {password: password.value, email: username.value}).then(res=>{
-    console.log("res login", res)
-    // localStorage.setItem('access_token', res.accessToken);
-    // document.cookie = `access_token=${res.accessToken}`;
-    // router.push('/cabinet/dashboard');
-  }).catch(err=>{
-    console.log("err", err.response.data)
+
+fetch('https://helped-lucky-prawn.ngrok-free.app/api/v1/auth/', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    password: password.value,
+    email: username.value
+  }),
+  mode: 'cors', // Ensures fetch is in CORS mode
+  credentials: 'include' // Use this if your backend expects cookies for sessions/auth
+})
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
   })
+  .then(data => {
+    console.log("res login", data);
+    localStorage.setItem('access_token', data.access_token);
+    localStorage.setItem('user_info', JSON.stringify(data.user));
+    router.push(`/cabinet/dashboard`);
+  })
+  .catch(error => {
+    console.error("POST request error:", error);
+  });
+
+
+
 }
 
 </script>

@@ -60,6 +60,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 // Register FontAwesomeIcon globally
 app.component('font-awesome-icon', FontAwesomeIcon);
 
+
 app.mount('#app')
 
 

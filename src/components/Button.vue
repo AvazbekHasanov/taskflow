@@ -1,5 +1,5 @@
 <template>
-  <button @click="sendMessage" data-testid="send-button" class="button ">
+  <button  data-testid="send-button" class="button ">
     <slot></slot>
     <span class="ml-2">{{ buttonText }}</span>
   </button>

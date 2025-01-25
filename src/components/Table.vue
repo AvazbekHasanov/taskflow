@@ -14,7 +14,17 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(row, index) in paginatedData" :key="index">
+          <tr
+            v-for="(row, index) in paginatedData"
+            :key="index"
+            :class="{
+              'table-row-do': row.status === 'DO',
+              'table-row-done': row.status === 'DONE',
+              'table-row-ns': row.status === 'NS',
+              'table-row-in': row.status === 'IN',
+              'table-row-ot': row.status === 'OT'
+            }"
+          >
             <td v-for="(column, index) in columns" :key="index">{{ row[column.field] }}</td>
           </tr>
         </tbody>
@@ -24,18 +34,36 @@
         <span>Page {{ currentPage }} of {{ totalPages }}</span>
         <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
       </div>
+
+      <div class="legend-container" v-if="type==='task'">
+      <h4>Task Status Legend:</h4>
+      <ul class="status-legend flex flex-row gap-4">
+        <li><span class="legend-box do"></span> DO: Tasks to be done</li>
+        <li><span class="legend-box done"></span> DONE: Completed tasks</li>
+        <li><span class="legend-box ns"></span> NS: Not started</li>
+        <li><span class="legend-box in"></span> IN: In progress</li>
+        <li><span class="legend-box ot"></span> OT: Overdue tasks</li>
+      </ul>
+    </div>
+
     </div>
   </div>
 </template>
 
+
 <script>
 export default {
   name: "TableComponent",
+
   props: {
     columns: {
       type: Array,
       required: true,
     },
+    type: {
+    type: String,
+      default: null
+  },
     data: {
       type: Array,
       required: true,
@@ -135,5 +163,70 @@ export default {
 .pagination button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
+}
+table-row-do {
+  background-color: #f0f8ff; /* Light Blue */
+}
+
+.table-row-done {
+  background-color: #d4edda; /* Light Green */
+}
+
+.table-row-ns {
+  background-color: #f8d7da; /* Light Red */
+  color: red;
+}
+
+.table-row-in {
+  background-color: #fff3cd; /* Light Yellow */
+  color: black;
+}
+
+.table-row-ot {
+  background-color: #d1ecf1; /* Light Cyan */
+  color: black;
+}
+
+/* Legend styles */
+.legend-container {
+  margin-top: 20px;
+}
+
+.status-legend {
+  list-style-type: none;
+  padding: 0;
+}
+
+.status-legend li {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.legend-box {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  border: 1px solid #ddd;
+}
+
+.legend-box.do {
+  background-color: #fffbcc;
+}
+
+.legend-box.done {
+  background-color: #ccffcc;
+}
+
+.legend-box.ns {
+  background-color: #f0f0f0;
+}
+
+.legend-box.in {
+  background-color: #cce5ff;
+}
+
+.legend-box.ot {
+  background-color: #ffc6c6;
 }
 </style>

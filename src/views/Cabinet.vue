@@ -6,7 +6,9 @@
       <div :class="{'fixed-header':fixedHeader}">
         <Navbar></Navbar>
       </div>
-      <router-view style="height: calc(100vh - 70px) ; overflow: auto; " class="scrollable bg-white dark:bg-gray-800 dark:text-white"/>
+      <div class="scrollable bg-white dark:bg-gray-800 dark:text-white" style="height: calc(100vh - 70px) ; overflow: auto; ">
+        <router-view  />
+      </div>
     </div>
   </div>
 </template>
