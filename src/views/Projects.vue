@@ -4,6 +4,7 @@ import TableComponent from "@/components/Table.vue";
 import ElButton from "@/components/Button.vue";
 import ProjectCard from "@/components/ProjectCard.vue";
 import Modal from "@/components/Modal.vue";
+import apiFetch  from "@/utils/apiFetch.js";
 
 const userData = JSON.parse(localStorage.getItem("user_info")) || { id: null };
 
@@ -17,8 +18,10 @@ const columns = ref([
 const editedProject = ref({
   id: "",
   name: "",
-  pmId: "",
-  companyId: userData.id,
+  ownerId: "",
+  description: null,
+  budget: 0,
+  companyId: 1,
   startDate: "",
   endDate: "",
 });
@@ -31,29 +34,30 @@ const userRole = ref(null)
 
 
 
-// Generic fetch utility
-const fetchData = async (url, options = {}) => {
-  try {
-    const response = await fetch(url, {
-     mode: 'cors',
-     credentials: 'include',
-      ...options,
-    });
-    if (!response.ok) throw new Error("Network response was not ok");
-    return await response.json();
-  } catch (error) {
-    console.error(`Error fetching ${url}:`, error);
-    throw error;
-  }
-};
+
 
 // Fetch project managers
 const getManagers = async () => {
-  const url = `https://helped-lucky-prawn.ngrok-free.app/api/v1/employee/pm-list/${userData.id}/`;
+  const url = `/emp/get-all`;
   try {
-    const data = await fetchData(url, { method: "GET" });
+    const data = await apiFetch(url, { method: "GET" });
     console.log("Managers fetched:", data);
-    managers.value = data;
+
+    managers.value = data
+        .filter(el => {
+          if (!el) {
+            console.warn("Missing element:", el);
+            return false;
+          }
+          if (!el.user) {
+            console.warn("Missing user in element:", el);
+            return false;
+          }
+          return el.user.role === 'PM';
+        })
+        .map(el => el); // Keep or transform as needed
+    console.log("managers.value", managers.value)
+
   } catch (error) {
     console.error("Error fetching managers:", error);
   }
@@ -76,9 +80,9 @@ const saveProject = async (e) => {
   e.stopPropagation();
   console.log("Edited project:", editedProject.value);
 
-  const url = `https://helped-lucky-prawn.ngrok-free.app/api/v1/project/create/`;
+  const url = `/pro/create`;
   try {
-    const data = await fetchData(url, {
+    const data = await apiFetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(editedProject.value),
@@ -87,7 +91,7 @@ const saveProject = async (e) => {
 
     const { companyId } = editedProject.value;
     editedProject.value = { companyId }; // Reset all other fields
-    getProjectList();
+    await getProjectList();
     closeModal();
   } catch (error) {
     console.error("Error saving project:", error);
@@ -98,11 +102,11 @@ const saveProject = async (e) => {
 const getProjectList = async ()=>{
   loading.value = true
   let role = userData.position? `?position=${userData.position}` : ''
-    const url = `https://helped-lucky-prawn.ngrok-free.app/api/v1/project/list/${userData.id}/${role}`;
+    const url = `/pro/get-list`;
   try {
-    const data = await fetchData(url, {
+    const data = await apiFetch(url, {
       method: "GET",
-      headers: { "Content-Type": "application/json" }
+      headers: { "content-type": "application/json" }
     });
     console.log("Project list:", data);
     projectLists.value = data
@@ -136,7 +140,7 @@ onMounted(() => {
         <ProjectCard :project="project" v-for="(project, index) in projectLists" :key="index" />
       </div>
       <div class="w-full flex justify-end">
-        <ElButton button-text="Add new project" @click="addProject" class="add_new_project" v-if="userRole === 'CO'">
+        <ElButton button-text="Add new project" @click="addProject" class="add_new_project" v-if="userRole === 'CO' || userRole === 'ROLE_PM'">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="width: 24px; height: 24px;">
             <path
               d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z" />
@@ -163,10 +167,22 @@ onMounted(() => {
             </div>
 
             <div>
+              <label for="project-name" class="block text-sm font-medium dark:text-gray-300">Project description</label>
+              <input
+                  type="text"
+                  v-model="editedProject.description"
+                  id="project-description"
+                  name="project-description"
+                  class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  placeholder="Enter project description"
+              />
+            </div>
+
+            <div>
               <label for="project-manager" class="text-white">Project Manager</label>
-              <select v-model="editedProject.pmId" class="h-10 w-full mt-1 bg-gray-800 text-white border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select v-model="editedProject.ownerId" class="h-10 w-full mt-1 bg-gray-800 text-white border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option v-for="manager in managers" :key="manager.id" :value="manager.id" class="bg-gray-800 hover:bg-gray-600 text-white hover:text-yellow-300">
-                  {{ manager.firstName + ' ' + manager.lastName }}
+                  {{ manager.firstname + ' ' + manager.lastname }}
                 </option>
               </select>
               <div class="flex flex-row justify-between pt-4 gap-4">

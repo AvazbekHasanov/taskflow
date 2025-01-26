@@ -52,8 +52,8 @@ export default {
   },
   mounted() {
     document.addEventListener('click', (e) => {
+      return
       const modalContainer = document.querySelector('.modal-container');
-      console.log("e.target.closest", e.target.classList)
 
       const parentHasAddNewProject = (e.target.closest('.add_new_project') || e.target.closest('.add_new_item')) !== null;
 
@@ -86,7 +86,8 @@ export default {
 .modal-container {
   width: fit-content;
   margin: 0 auto;
-  max-height: 70vh;
+  height: fit-content;
+  max-height: fit-content;
   padding: 20px 30px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);

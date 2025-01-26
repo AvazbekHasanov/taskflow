@@ -47,7 +47,6 @@ export default {
     };
   },
   mounted() {
-    console.log("item", this.item, this.userData)
   },
   methods: {
     hasOneShowingChild(children = [], parent) {

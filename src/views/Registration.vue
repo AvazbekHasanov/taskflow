@@ -4,6 +4,9 @@ import {useRoute} from "vue-router";
 import {ref, onMounted, reactive} from "vue";
 import { getCurrentInstance } from 'vue';
 import {data} from "autoprefixer";
+import apiFetch from "@/utils/apiFetch.js";
+import * as url from "node:url";
+import router from "@/router/index.js";
 
 const route = useRoute();
 
@@ -16,36 +19,39 @@ const errorMessages = reactive({
 
 const userData = ref({
   user_id: route.params.user_id,
-  first_name: '',
-  last_name: '',
-  role: '',
-  email: '',
+  login: '',
   password: '',
+  email: '',
   remember_me: false
 })
 
 const { proxy } = getCurrentInstance();
 
-const registerUser = ()=>{
+const registerUser = async ()=>{
   for (let key in userData.value){
     if (!userData.value[key] && key != 'user_id') {
       console.log(userData.value)
       return
     }
   }
-  proxy.$axios.post('/auth/register', userData.value)
-  .then(response => {
-    console.log("response", response)
-  })
-  .catch(error => {
+try{
+    const url = '/auth/signup'
+   const data = await apiFetch(url, {
+     method: 'POST',
+     headers: {
+       'Content-Type': 'application/json',
+     },
+     body: JSON.stringify({"email": userData.value.email,
+       "login": userData.value.login,
+       "password": userData.value.password})
+   })
+  console.log("data dfsd", data)
+  await router.push(`/auth/login`);
+
+} catch(error) {
     console.error('There was an error!', error.response.data.typeError);
-    if (error.response.data.typeError === 'EMAIL_ADDRESS_ALREADY_EXISTS'){
-      errorMessages.is_show_email_error = true;
-      console.log("errorMessages.is_show_email_error", errorMessages.is_show_email_error)
-    }else if(error.response.data.typeError === 'USERNAME_ADDRESS_ALREADY_EXISTS'){
-      errorMessages.is_show_role_error = true;
-    }
-  });
+
+  };
 }
 
 
@@ -54,28 +60,28 @@ const registerUser = ()=>{
 </script>
 
 <template>
-<div class="font-[sans-serif] bg-white  flex items-center justify-center mx-auto md:h-screen p-4 dark:bg-gray-800">
+<div class="font-[sans-serif] bg-white w-full h-full  flex items-center justify-center mx-auto md:h-screen p-4 dark:bg-gray-800">
       <div class="grid md:grid-cols-3 items-center shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] rounded-xl overflow-hidden max-w-4xl">
         <div class="max-md:order-1 flex flex-col justify-center space-y-16 max-md:mt-16 min-h-full bg-gradient-to-r from-gray-900 to-gray-700 lg:px-8 px-4 py-4">
           <div>
-            <h4 class="text-white text-lg font-semibold dark:text-gray-100">Create Employee Account</h4>
+            <h4 class="text-white text-lg font-semibold dark:text-gray-100">Create Your Account</h4>
             <p class="text-[13px] text-gray-300 mt-3 leading-relaxed dark:text-gray-100">Welcome to the employee registration page! Create your account to get started.</p>
           </div>
         </div>
 
         <form class="md:col-span-2 w-full py-6 px-6 sm:px-16" id="registration-form" @submit.prevent="handleSubmit">
           <div class="mb-6">
-            <h3 class="text-gray-800 text-2xl font-bold dark:text-gray-100">Create an Employee Account</h3>
+            <h3 class="text-gray-800 text-2xl font-bold dark:text-gray-100">Create Your Account</h3>
           </div>
 
           <div class="space-y-6">
             <div class="flex gap-2">
 
             <div class="w-1/2">
-              <label class="text-gray-800 text-sm mb-2 block dark:text-gray-100">First name</label>
+              <label class="text-gray-800 text-sm mb-2 block dark:text-gray-100">Login</label>
               <div class="relative flex items-center">
-                <input name="name" type="text" v-model="userData.first_name" required class="text-gray-800 bg-white border border-gray-300 w-full text-sm px-4 pr-8 py-2.5 rounded-md
-                 outline-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Enter name" />
+                <input name="name" type="text" v-model="userData.login" required class="text-gray-800 bg-white border border-gray-300 w-full text-sm px-4 pr-8 py-2.5 rounded-md
+                 outline-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="login" />
                 <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-4 h-4 absolute right-4" viewBox="0 0 24 24">
                   <circle cx="10" cy="7" r="6" data-original="#000000"></circle>
                   <path d="M14 15H6a5 5 0 0 0-5 5 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 5 5 0 0 0-5-5zm8-4h-2.59l.3-.29a1 1 0 0 0-1.42-1.42l-2 2a1 1 0 0 0 0 1.42l2 2a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.42l-.3-.29H22a1 1 0 0 0 0-2z" data-original="#000000"></path>
@@ -84,9 +90,9 @@ const registerUser = ()=>{
             </div>
 
             <div class="w-1/2">
-              <label class="text-gray-800 text-sm mb-2 block dark:text-gray-100">Last name</label>
+              <label class="text-gray-800 text-sm mb-2 block dark:text-gray-100">Password</label>
               <div class="relative flex items-center">
-                <input name="name" type="text" v-model="userData.last_name" required class="text-gray-800 bg-white border border-gray-300 w-full text-sm px-4 pr-8 py-2.5 rounded-md outline-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Enter name" />
+                <input name="name" type="text" v-model="userData.password" required class="text-gray-800 bg-white border border-gray-300 w-full text-sm px-4 pr-8 py-2.5 rounded-md outline-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="password" />
                 <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-4 h-4 absolute right-4" viewBox="0 0 24 24">
                   <circle cx="10" cy="7" r="6" data-original="#000000"></circle>
                   <path d="M14 15H6a5 5 0 0 0-5 5 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 5 5 0 0 0-5-5zm8-4h-2.59l.3-.29a1 1 0 0 0-1.42-1.42l-2 2a1 1 0 0 0 0 1.42l2 2a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.42l-.3-.29H22a1 1 0 0 0 0-2z" data-original="#000000"></path>
@@ -95,17 +101,6 @@ const registerUser = ()=>{
             </div>
             </div>
 
-             <div>
-              <label class="text-gray-800 text-sm mb-2 block dark:text-gray-100">Role</label>
-              <div class="relative flex items-center">
-                <input name="name" type="text" v-model="userData.role" @input="errorMessages.is_show_role_error = false" required class="text-gray-800 bg-white border border-gray-300 w-full text-sm px-4 pr-8 py-2.5 rounded-md outline-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Enter employee role" />
-                <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-4 h-4 absolute right-4" viewBox="0 0 24 24">
-                  <circle cx="10" cy="7" r="6" data-original="#000000"></circle>
-                  <path d="M14 15H6a5 5 0 0 0-5 5 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 5 5 0 0 0-5-5zm8-4h-2.59l.3-.29a1 1 0 0 0-1.42-1.42l-2 2a1 1 0 0 0 0 1.42l2 2a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.42l-.3-.29H22a1 1 0 0 0 0-2z" data-original="#000000"></path>
-                </svg>
-              </div>
-               <span class="text-red-600" v-if="errorMessages.is_show_role_error">{{errorMessages.role_error}}  </span>
-            </div>
 
             <div>
               <label class="text-gray-800 text-sm mb-2 block dark:text-gray-100">Email address</label>

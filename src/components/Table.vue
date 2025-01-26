@@ -18,14 +18,18 @@
             v-for="(row, index) in paginatedData"
             :key="index"
             :class="{
-              'table-row-do': row.status === 'DO',
-              'table-row-done': row.status === 'DONE',
-              'table-row-ns': row.status === 'NS',
-              'table-row-in': row.status === 'IN',
-              'table-row-ot': row.status === 'OT'
+              'table-row-do': row.status === 'PENDING',
+              'table-row-done': row.status === 'COMPLETED',
+              'table-row-ns': row.status === 'BACKLOG',
+              'table-row-in': row.status === 'IN_PROGRESS',
+              'table-row-ot': row.status === 'CANCELLED'
             }"
           >
-            <td v-for="(column, index) in columns" :key="index">{{ row[column.field] }}</td>
+            <td v-for="(column, index) in columns" :key="index">
+              <span v-if="column.field === 'assignedTo' && !row[column.field]"> <el-button @click="assignToWorker(row)"> Assign to worker </el-button> </span>
+             <span v-else> {{ row[column.field] }} </span>
+
+            </td>
           </tr>
         </tbody>
       </table>
@@ -105,6 +109,9 @@ export default {
     },
   },
   methods: {
+    assignToWorker(data) {
+      this.$emit('worker-assigned', data); // Emit an event called 'worker-assigned' with the payload 'data'
+    },
     sortTable(column) {
       if (this.sortColumn === column.field) {
         this.sortOrder = this.sortOrder === "asc" ? "desc" : "asc";

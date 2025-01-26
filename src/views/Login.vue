@@ -3,6 +3,8 @@ import {RouterLink} from "vue-router";
 import axios from "axios";
 import {reactive, ref, getCurrentInstance} from "vue";
 import router from "@/router/index.js";
+import {jwtDecode} from "jwt-decode";
+import apiFetch from '../utils/apiFetch';
 
 const { proxy } = getCurrentInstance();
 
@@ -19,40 +21,29 @@ const password = reactive({
 })
 
 const isSaveUsername = ref(false)
-const login = (e)=>{
+const login = async (e) => {
   e.preventDefault();
+  try {
+    const data = await apiFetch('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({
+        login: username.value,
+        password: password.value,
+      }),
+    });
 
-fetch('https://helped-lucky-prawn.ngrok-free.app/api/v1/auth/', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    password: password.value,
-    email: username.value
-  }),
-  mode: 'cors', // Ensures fetch is in CORS mode
-  credentials: 'include' // Use this if your backend expects cookies for sessions/auth
-})
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log("res login", data);
-    localStorage.setItem('access_token', data.access_token);
-    localStorage.setItem('user_info', JSON.stringify(data.user));
-    router.push(`/cabinet/dashboard`);
-  })
-  .catch(error => {
-    console.error("POST request error:", error);
-  });
+    // Store the access token
+    localStorage.setItem('access_token', data.accessToken);
 
-
-
-}
+    const userData = jwtDecode(data.accessToken);
+    userData.is_full_registrated = data.haveProfile
+    localStorage.setItem('user_info', JSON.stringify(userData));
+    await router.push(`/cabinet/dashboard`);
+  } catch (error) {
+    console.error('Login error:', error.message);
+    throw error;
+  }
+};
 
 </script>
 
@@ -63,6 +54,13 @@ fetch('https://helped-lucky-prawn.ngrok-free.app/api/v1/auth/', {
       <h2 class="mt-6 text-center text-3xl leading-9 font-extrabold text-gray-900 dark:text-gray-100">
         Sign in to your account
       </h2>
+      <p class="mt-2 text-center text-sm leading-5 text-blue-500 max-w">
+        Or
+        <RouterLink to="/auth/registration"
+                    class="font-medium text-blue-500 hover:text-blue-500 focus:outline-none focus:underline transition ease-in-out duration-150">
+          create a new acccount
+        </RouterLink>
+      </p>
     </div>
 
 
@@ -73,7 +71,7 @@ fetch('https://helped-lucky-prawn.ngrok-free.app/api/v1/auth/', {
             <label for="email" class="block text-sm font-medium leading-5  text-gray-700 dark:text-gray-100">Email
               address</label>
             <div class="mt-1 relative rounded-md shadow-sm">
-              <input id="email" name="email" placeholder="user@example.com" type="email" required="" v-model="username.value" class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5
+              <input id="email" name="email" placeholder="user@example.com" type="text" required="" v-model="username.value" class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5
 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
               <div class="hidden absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                 <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">

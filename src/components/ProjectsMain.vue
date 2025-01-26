@@ -60,6 +60,7 @@ import "swiper/swiper-bundle.css"; // Import Swiper styles
 import {ref, onMounted} from "vue";
 import ProjectCard from "@/components/ProjectCard.vue";
 import Modal from '@/components/Modal.vue'
+import apiFetch from "@/utils/apiFetch.js";
 
 const projectLists = ref([]);
 const showModal = ref(false);
@@ -112,15 +113,16 @@ const fetchData = async (url, options = {}) => {
 
 // Fetch project list
 const getProjectList = async () => {
-  const url = `https://helped-lucky-prawn.ngrok-free.app/api/v1/project/list/`;
+  const url = `/pro/get-list`;
   try {
-    const data = await fetchData(url, {
+    const data = await apiFetch(url, {
       method: "GET",
-      headers: {"Content-Type": "application/json"},
+      headers: { "content-type": "application/json" }
     });
-    projectLists.value = data;
+    console.log("Project list:", data);
+    projectLists.value = data
   } catch (error) {
-    console.error("Error fetching project list:", error);
+    console.error("Error saving project:", error);
   }
 };
 

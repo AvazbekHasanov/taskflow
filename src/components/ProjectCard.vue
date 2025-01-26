@@ -8,7 +8,7 @@
           <li v-if="!is_public" @click="viewProject">View Project</li>
           <li v-if="!is_public" @click="editProject">Edit Project</li>
           <li v-if="!is_public" @click="deleteProject">Delete Project</li>
-          <li v-if="!is_public" @click="enterChat">Enter  chat</li>
+          <li v-if="!is_public" @click="enterChat">Download documentation</li>
           <li class="dropdown-menu-item" v-if="is_public" @click="sendFeedback">Send feedback</li>
         </ul>
       </div>
@@ -19,7 +19,7 @@
     <div class="manager-info">
       <img :src="`https://www.bank-kredit.uz/media/store/images/png/platon_user.png`" alt="Manager's Avatar" class="manager-avatar" />
       <span>Project Manager:</span>
-      <span class="manager-name">{{ project.pmId.firstName + ' '+  project.pmId.lastName}}</span>
+      <span class="manager-name">{{ project.owner.firstname + ' ' + project.owner.lastname}}</span>
     </div>
   </div>
 </template>
@@ -66,7 +66,8 @@ export default {
       console.log('Deleting project:', this.project.name);
     },
     enterChat(){
-      router.push(`/cabinet/chat?project_id=${this.project.id}`);
+      window.open(`https://sculpin-golden-bluejay.ngrok-free.app/api/report/download/${this.project.id}`, '_blank');
+      // router.push(`/cabinet/chat?project_id=${this.project.id}`);
     },
   },
   mounted() {

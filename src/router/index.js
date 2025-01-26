@@ -78,17 +78,19 @@ const router = createRouter({
             component: Main
         },
 
-        // {
-        //     path: '/:catchAll(.*)',
-        //     name: 'not-found',
-        //     component: NotFound
-        // }
+        {
+            path: '/:catchAll(.*)',
+            name: 'not-found',
+            component: NotFound
+        }
     ]
 })
 
 const publicRoutes = ['login', 'registration']
 
 router.beforeEach((to, from, next) => {
+
+
 
   if ( publicRoutes.includes(to.name)) {
     next();
@@ -100,14 +102,19 @@ router.beforeEach((to, from, next) => {
               query: {next: encodeURIComponent(to.fullPath)}
           });
       }
-      let userData = jwtDecode.decode(jwt);
+      let userData = JSON.parse(localStorage.getItem('user_info'));
     if (userData.exp <  Date.now()/1000) {
       next({
         name: 'login',
         query: { next: encodeURIComponent(to.fullPath) }
       });
     } else {
-      next();
+        if (!userData.is_full_registrated && to.name !== 'profile') {
+
+            router.push(`/cabinet/profile`);
+        } else {
+            next();
+        }
     }
   }
 });

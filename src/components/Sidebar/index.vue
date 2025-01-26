@@ -53,13 +53,13 @@ export default {
  routes: {
     type: Array,
     default: () => {
-      const userRole = JSON.parse(localStorage.getItem('user_info')).role;
+      const userRole = 'CO'
+          // JSON.parse(localStorage.getItem('user_info')).role;
       const routes = [
         { path: '/cabinet/dashboard', name: 'Dashboard', meta: { title: 'Dashboard', icon: 'Document' }, perm: false },
         { path: '/cabinet/projects', name: 'Projects', meta: { title: 'Projects', icon: 'Briefcase' }, perm: false },
         { path: '/cabinet/workers', name: 'Employees', meta: { title: 'Employees', icon: 'User' }, perm: 'CO' },
         { path: '/cabinet/tasks', name: 'Tasks', meta: { title: 'Tasks', icon: 'List' }, perm: false },
-        { path: '/cabinet/tickets', name: 'Tickets', meta: { title: 'Tickets', icon: 'Tickets' }, perm: false },
         { path: '/cabinet/profile', name: 'Profile', meta: { title: 'Profile', icon: 'UserFilled' }, perm: false }
       ];
 
